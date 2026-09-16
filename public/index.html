@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ventanilla PQR Institucional</title>
+  <style>
+    :root { --ink:#f2f7ff; --muted:#9eb0ca; --panel:#111d35; --line:#2b4265; --cyan:#48e0d0; --orange:#ffb45b; --danger:#ec7183; --background:#071126; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:radial-gradient(circle at 75% -10%,#18355b 0,transparent 34%),var(--background); font:14px/1.45 "Trebuchet MS",Verdana,sans-serif; }
+    button,input,select,textarea { font:inherit; }
+    button { cursor:pointer; }
+    .shell { width:min(1180px,calc(100% - 36px)); margin:0 auto; padding:26px 0 38px; }
+    .topbar,.brand,.top-actions,.stats,.tabs,.actions,.search-row { display:flex; align-items:center; }
+    .topbar { justify-content:space-between; gap:24px; margin-bottom:28px; }
+    .brand { gap:12px; }
+    .brand-mark { display:grid; width:42px; height:42px; place-items:center; color:#071126; background:var(--orange); border-radius:12px; font-weight:900; }
+    .eyebrow { margin:0; color:var(--cyan); font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+    .brand h1 { margin:2px 0 0; font-size:19px; }
+    .top-actions { gap:12px; color:var(--muted); }
+    .top-actions button { padding:9px 14px; color:#101a2d; background:var(--orange); border:0; border-radius:7px; font-weight:800; }
+    .top-actions span { white-space:nowrap; }
+    .stats { gap:14px; margin-bottom:20px; }
+    .stat { flex:1; min-height:82px; padding:15px 18px; background:linear-gradient(135deg,#102344,#0d1930); border:1px solid #25436c; border-radius:10px; }
+    .stat strong { display:block; margin-bottom:4px; color:var(--cyan); font-size:15px; }
+    .stat strong span { float:right; color:var(--ink); font-size:23px; line-height:1; }
+    .stat p { margin:0; color:var(--muted); font-size:12px; }
+    .workspace { overflow:hidden; background:rgb(11 26 52 / 88%); border:1px solid #25466d; border-radius:13px; box-shadow:0 18px 50px rgb(0 0 0 / 25%); }
+    .workspace-head { padding:23px 25px 0; border-bottom:1px solid var(--line); }
+    .workspace-title h2 { margin:0 0 5px; color:var(--cyan); font-size:18px; letter-spacing:.02em; }
+    .workspace-title p { margin:0 0 20px; color:var(--muted); }
+    .tabs { gap:8px; }
+    .tab { padding:11px 16px; color:var(--muted); background:transparent; border:1px solid transparent; border-radius:8px 8px 0 0; }
+    .tab.active { color:#071126; background:var(--cyan); font-weight:800; }
+    .view { display:none; padding:26px; }
+    .view.active { display:block; animation:appear .25s ease-out; }
+    @keyframes appear { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
+    .lesson { margin-bottom:19px; padding:16px 18px; color:#d9e5f7; background:#142b50; border-left:3px solid var(--cyan); border-radius:7px; }
+    .lesson strong { color:var(--cyan); }
+    .cards { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+    .info-card { min-height:145px; padding:18px; background:linear-gradient(145deg,#183766,#122744); border:1px solid #31547f; border-radius:9px; }
+    .info-card h3 { margin:0 0 8px; font-size:15px; }
+    .info-card p { margin:0; color:var(--muted); }
+    .sla { display:inline-block; margin-top:17px; padding:5px 9px; color:#bffcf2; background:#165b64; border-radius:5px; font-size:11px; font-weight:700; }
+    .sla.warn { color:#2b1a08; background:var(--orange); }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+    .field.full { grid-column:1 / -1; }
+    label,legend { display:block; margin-bottom:7px; color:#d6e1f0; font-weight:700; }
+    fieldset { margin:0; padding:0; border:0; }
+    .radio-group { display:flex; flex-wrap:wrap; gap:15px; padding-top:7px; }
+    .radio-group label,.check { margin:0; color:var(--muted); font-weight:400; }
+    input,select,textarea { width:100%; padding:11px 12px; color:var(--ink); background:#0b1a34; border:1px solid #355477; border-radius:6px; outline:none; }
+    input:focus,select:focus,textarea:focus { border-color:var(--cyan); box-shadow:0 0 0 2px rgb(72 224 208 / 15%); }
+    textarea { min-height:105px; resize:vertical; }
+    option { color:#111; }
+    .check { display:flex; align-items:flex-start; gap:9px; }
+    .check input { width:auto; margin-top:4px; accent-color:var(--cyan); }
+    .error,.status { min-height:18px; margin:6px 0 0; color:var(--danger); font-size:12px; }
+    .actions { justify-content:space-between; gap:14px; margin-top:20px; }
+    .primary,.search-row button { padding:11px 19px; color:#071126; background:var(--cyan); border:0; border-radius:6px; font-weight:800; }
+    .primary:disabled { opacity:.6; cursor:wait; }
+    .button-muted { padding:10px 17px; color:var(--muted); background:transparent; border:1px solid #385477; border-radius:6px; }
+    .search-row { align-items:flex-end; gap:12px; max-width:650px; }
+    .search-row label { flex:1; }
+    .search-result { max-width:820px; margin-top:20px; padding:17px; background:#142b50; border:1px solid #31547f; border-radius:8px; }
+    .search-result:empty { display:none; }
+    .search-result dl { display:grid; grid-template-columns:170px 1fr; gap:8px 15px; margin:0; }
+    .search-result dt { color:var(--cyan); font-weight:700; }
+    .search-result dd { margin:0; white-space:pre-wrap; }
+    .table-wrap { overflow-x:auto; margin-top:25px; }
+    table { width:100%; min-width:720px; border-collapse:collapse; }
+    th,td { padding:13px 12px; border-bottom:1px solid var(--line); text-align:left; }
+    th { color:var(--muted); font-size:12px; }
+    .empty { padding:30px 10px; color:var(--muted); text-align:center; }
+    .ticket-id { color:var(--cyan); font-weight:800; }
+    .state { display:inline-block; padding:4px 9px; color:#bffcf2; background:#165b64; border-radius:999px; font-size:11px; font-weight:700; }
+    .sla-days { color:var(--orange); font-weight:700; }
+    .state-select { width:auto; min-width:132px; padding:7px 8px; font-size:12px; }
+    .save-state { margin-top:6px; padding:5px 8px; color:#071126; background:var(--cyan); border:0; border-radius:4px; font-size:11px; font-weight:800; }
+    .save-state:disabled { opacity:.6; cursor:wait; }
+    .admin-login { max-width:460px; margin:0 auto; padding:24px; background:linear-gradient(145deg,#183766,#122744); border:1px solid #31547f; border-radius:9px; }
+    .admin-login h3 { margin:0 0 8px; color:var(--cyan); }
+    .admin-login p { margin:0 0 18px; color:var(--muted); }
+    .admin-login .field { margin-bottom:14px; }
+    .admin-bar { display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:18px; padding:11px 14px; background:#142b50; border:1px solid #31547f; border-radius:7px; }
+    .admin-bar strong { color:var(--cyan); }
+    .response-input { min-width:190px; min-height:52px; margin-top:7px; padding:7px 8px; font-size:12px; }
+    .footer { display:flex; justify-content:space-between; margin-top:16px; color:var(--muted); font-size:12px; }
+    @media (max-width:720px) {
+      .shell { width:min(100% - 20px,1180px); padding-top:16px; }
+      .topbar,.top-actions,.actions { align-items:flex-start; flex-direction:column; }
+      .stats,.cards,.form-grid { flex-direction:column; display:flex; }
+      .field.full { grid-column:auto; }
+      .workspace-head { padding:18px 15px 0; }
+      .view { padding:18px 15px; }
+      .tabs { overflow-x:auto; width:calc(100vw - 50px); }
+      .tab { flex:0 0 auto; }
+      .search-row { align-items:stretch; flex-direction:column; }
+      .footer { flex-direction:column; gap:8px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">PQR</span><div><p class="eyebrow">Consejo Directivo</p><h1>Ventanilla Institucional</h1><small>Calidad y procesos institucionales</small></div></div>
+      <div class="top-actions"><button type="button" id="slidesButton">▣ Diapositivas</button><span>▤ Informe Ejecutivo</span><span>◌ Notas del proceso</span></div>
+    </header>
+    <section class="stats" aria-label="Indicadores del sistema">
+      <article class="stat"><strong>3.1 Planes con KPIs Mensuales <span>03</span></strong><p>Metas de perfil y tareas extraordinarias con corte mensual para Rectoría y Consejo Directivo.</p></article>
+      <article class="stat"><strong>3.2 Ventanilla con Tickets &amp; SLAs <span id="ticketCount">00</span></strong><p>Registros recibidos y seguimiento de tiempos de respuesta institucional.</p></article>
+      <article class="stat"><strong>3.3 Triaje Pedagógico <span>03</span></strong><p>Educación al estudiante y directorio interactivo para evitar requerimientos equivocados.</p></article>
+    </section>
+    <section class="workspace">
+      <div class="workspace-head">
+        <div class="workspace-title"><h2>▱ VENTANILLA ÚNICA DIGITAL DE PQRs CON SISTEMA DE TICKETS</h2><p>Triaje pedagógico informativo, SLA automatizado y tablero de calidad</p></div>
+        <nav class="tabs" aria-label="Etapas del proceso"><button class="tab active" data-view="learn" type="button">▣ 1. Triaje Pedagógico</button><button class="tab" data-view="create" type="button">➤ 2. Radicar con SLA</button><button class="tab" data-view="board" type="button">▤ 3. Tablero de Control</button></nav>
+      </div>
+      <section class="view active" id="learn">
+        <div class="lesson"><strong>Filtro Preventivo Institucional:</strong> el 65% de las quejas surge porque el estudiante desconoce la diferencia entre Petición, Queja o Reclamo, o no sabe a qué departamento acudir. Este módulo pedagógico educa al estudiante antes de radicar.</div>
+        <div class="cards"><article class="info-card"><h3>◉ ¿Qué es una Petición?</h3><p>Solicitud respetuosa para requerir información, certificados, constancias de estudio o copias de actas.</p><span class="sla">SLA Máximo: 5 Días Hábiles</span></article><article class="info-card"><h3>◉ ¿Qué es una Queja / Reclamo?</h3><p>Manifestación de inconformidad por la prestación de un servicio, conducta docente o cobro no justificado.</p><span class="sla warn">SLA Máximo: 15 Días Hábiles</span></article><article class="info-card"><h3>◎ Directorio de Áreas</h3><p>• Académica: notas, docentes, horarios<br>• Cartera: pagos y saldos<br>• Prácticas: convenios, plazas, cartas</p></article></div>
+        <div class="actions"><span class="status">¿Ya tienes clara tu solicitud? El siguiente paso es registrar el radicado.</span><button class="primary" id="openGoogleForm" type="button">Comprendo los términos → Abrir formulario</button></div>
+      </section>
+      <section class="view" id="create">
+        <div class="lesson"><strong>Formulario institucional:</strong> las solicitudes se registran mediante Google Forms. Al finalizar, conserva la confirmación o número de respuesta que te entregue Google.</div>
+        <div class="admin-login"><h3>Radicar una nueva solicitud</h3><p>El formulario oficial se abrirá en una nueva pestaña. Completa allí tus datos y descripción de la PQR.</p><button class="primary" id="openGoogleFormSecondary" type="button">Abrir Google Forms</button></div>
+        <div hidden>
+        <form id="pqrForm" novalidate><div class="form-grid">
+          <div class="field"><fieldset><legend>Tipo de documento *</legend><div class="radio-group"><label><input type="radio" name="tipoDocumento" value="Cedula de Ciudadania" required> Cédula</label><label><input type="radio" name="tipoDocumento" value="Cedula de Extranjeria"> Extranjería</label><label><input type="radio" name="tipoDocumento" value="NIT"> NIT</label><label><input type="radio" name="tipoDocumento" value="Pasaporte"> Pasaporte</label></div><p class="error" data-error="tipoDocumento"></p></fieldset></div>
+          <div class="field"><label for="tipoSolicitud">Tipo de solicitud *</label><select id="tipoSolicitud" name="tipoSolicitud" required><option value="">Selecciona una opción</option><option value="Peticion">Petición</option><option value="Queja">Queja</option><option value="Reclamo">Reclamo</option><option value="Sugerencia">Sugerencia</option></select><p class="error" data-error="tipoSolicitud"></p></div>
+          <div class="field"><label for="numeroDocumento">Número de documento *</label><input id="numeroDocumento" name="numeroDocumento" required><p class="error" data-error="numeroDocumento"></p></div><div class="field"><label for="nombreCompleto">Nombre completo *</label><input id="nombreCompleto" name="nombreCompleto" autocomplete="name" required><p class="error" data-error="nombreCompleto"></p></div>
+          <div class="field"><label for="correoElectronico">Correo electrónico *</label><input id="correoElectronico" name="correoElectronico" type="email" autocomplete="email" required><p class="error" data-error="correoElectronico"></p></div><div class="field"><label for="asunto">Asunto *</label><input id="asunto" name="asunto" required><p class="error" data-error="asunto"></p></div>
+          <div class="field full"><label for="descripcion">Descripción detallada *</label><textarea id="descripcion" name="descripcion" required></textarea><p class="error" data-error="descripcion"></p></div><div class="field full"><label class="check"><input id="habeasData" name="habeasData" type="checkbox" required> Autorizo el tratamiento de mis datos personales según la política de Habeas Data. *</label><p class="error" data-error="habeasData"></p></div>
+        </div><div class="actions"><span id="status" class="status" role="status"></span><div><button class="button-muted" data-go="learn" type="button">Cancelar</button> <button id="submitButton" class="primary" type="submit">➤ Generar Ticket y Notificar al Responsable</button></div></div></form>
+        </div>
+      </section>
+      <section class="view" id="board">
+        <div id="adminLogin" class="admin-login">
+          <h3>Acceso de gestión</h3>
+          <p>Inicia sesión para ver tickets, responder solicitudes y actualizar estados.</p>
+          <form id="loginForm" novalidate><div class="field"><label for="adminUsername">Usuario</label><input id="adminUsername" autocomplete="username" required></div><div class="field"><label for="adminPassword">Contraseña</label><input id="adminPassword" type="password" autocomplete="current-password" required></div><button class="primary" type="submit">Iniciar sesión</button><p id="loginStatus" class="status" role="status"></p></form>
+        </div>
+        <div id="adminContent" hidden>
+          <div class="admin-bar"><span>Sesión activa: <strong id="sessionUser"></strong></span><button id="logoutButton" class="button-muted" type="button">Cerrar sesión</button></div>
+          <div class="lesson"><strong>Tablero de Control:</strong> consulta cualquier ticket con su número de radicado. Puedes cambiar el estado y responder desde esta pantalla.</div>
+          <form id="searchForm" class="search-row" novalidate><label for="searchRadicado">Buscar por número de radicado<input id="searchRadicado" placeholder="Ejemplo: PQR-A1B2C3" autocomplete="off" required></label><button type="submit">⌕ Buscar</button></form><p id="searchStatus" class="status" role="status"></p><div id="searchResult" class="search-result" aria-live="polite"></div>
+          <div class="table-wrap"><table><thead><tr><th>Radicado / Tipo</th><th>Solicitante</th><th>Área Enrutada</th><th>SLA</th><th>Gestión administrativa</th></tr></thead><tbody id="ticketRows"><tr><td colspan="5" class="empty">Cargando tickets registrados...</td></tr></tbody></table></div>
+        </div>
+      </section>
+    </section>
+    <footer class="footer"><span>Ventanilla PQR • Calidad Institucional</span><span>Proceso 3: Calidad Institucional • Sistema de Tickets</span></footer>
+  </main>
+  <script>
+    const googleFormUrl='https://docs.google.com/forms/d/e/1FAIpQLSdwz_xhzRriBvxDbq6J4owjiLa_P0AWgF6AZ35Fkt6iirZ5SQ/viewform?usp=sharing&ouid=110883499334003498420'; const form=document.querySelector('#pqrForm'); const confirmation=document.querySelector('#confirmation'); const radicadoElement=document.querySelector('#radicado'); const statusElement=document.querySelector('#status'); const submitButton=document.querySelector('#submitButton'); const searchForm=document.querySelector('#searchForm'); const searchRadicado=document.querySelector('#searchRadicado'); const searchStatus=document.querySelector('#searchStatus'); const searchResult=document.querySelector('#searchResult'); const ticketRows=document.querySelector('#ticketRows'); const ticketCount=document.querySelector('#ticketCount'); const loginForm=document.querySelector('#loginForm'); const adminLogin=document.querySelector('#adminLogin'); const adminContent=document.querySelector('#adminContent'); const loginStatus=document.querySelector('#loginStatus'); const sessionUser=document.querySelector('#sessionUser'); const logoutButton=document.querySelector('#logoutButton'); let canManage=false;
+    function showView(viewId){document.querySelectorAll('.view').forEach((view)=>view.classList.toggle('active',view.id===viewId));document.querySelectorAll('.tab').forEach((tab)=>tab.classList.toggle('active',tab.dataset.view===viewId));if(viewId==='board')checkSession();}
+    document.querySelectorAll('[data-go]').forEach((button)=>button.addEventListener('click',()=>showView(button.dataset.go))); document.querySelectorAll('.tab').forEach((tab)=>tab.addEventListener('click',()=>showView(tab.dataset.view))); document.querySelector('#slidesButton').addEventListener('click',()=>showView('learn'));
+    function openGoogleForm(){window.open(googleFormUrl,'_blank','noopener,noreferrer');}
+    document.querySelector('#openGoogleForm').addEventListener('click',openGoogleForm); document.querySelector('#openGoogleFormSecondary').addEventListener('click',openGoogleForm);
+    function clearErrors(){document.querySelectorAll('.error').forEach((element)=>{element.textContent='';});}
+    function showErrors(errors){Object.entries(errors).forEach(([field,message])=>{const error=document.querySelector(`[data-error="${field}"]`);if(error)error.textContent=message;});}
+    function renderSearchResult(ticket){const details=[['Radicado',ticket.radicado],['Estado',ticket.estado],['Tipo de solicitud',ticket.tipoSolicitud],['SLA asignado',`${ticket.slaDias} días hábiles`],['Asunto',ticket.asunto],['Descripción',ticket.descripcion],['Respuesta',ticket.respuesta||'Sin respuesta registrada'],['Fecha de creación',new Date(ticket.fechaCreacion).toLocaleString('es-CO')]];const list=document.createElement('dl');details.forEach(([label,value])=>{const term=document.createElement('dt');const description=document.createElement('dd');term.textContent=label;description.textContent=value;list.append(term,description);});searchResult.replaceChildren(list);}
+    function renderTicketRow(ticket){const row=document.createElement('tr');const identity=document.createElement('td');const name=document.createElement('td');const area=document.createElement('td');const sla=document.createElement('td');const state=document.createElement('td');identity.innerHTML='<span class="ticket-id"></span><br><small></small>';identity.querySelector('.ticket-id').textContent=ticket.radicado;identity.querySelector('small').textContent=ticket.tipoSolicitud;name.textContent=ticket.nombreCompleto;area.textContent=ticket.tipoSolicitud==='Queja'||ticket.tipoSolicitud==='Reclamo'?'Atención y Calidad':'Área Académica';sla.innerHTML='<span class="sla-days"></span> días hábiles';sla.querySelector('.sla-days').textContent=ticket.slaDias;const selector=document.createElement('select');selector.className='state-select';selector.disabled=!canManage;['Registrada','En revision','Pendiente','Resuelta','Cerrada'].forEach((status)=>{const option=document.createElement('option');option.value=status;option.textContent=status;option.selected=status===ticket.estado;selector.append(option);});const response=document.createElement('textarea');response.className='response-input';response.placeholder='Escribir respuesta...';response.value=ticket.respuesta||'';response.disabled=!canManage;const save=document.createElement('button');save.className='save-state';save.type='button';save.textContent='Guardar';save.disabled=!canManage;save.addEventListener('click',()=>updateTicketStatus(ticket.radicado,selector,response,save));state.append(selector,response,save);row.append(identity,name,area,sla,state);return row;}
+    async function updateTicketStatus(radicado,selector,response,save){save.disabled=true;save.textContent='Guardando...';try{const result=await fetch(`/api/v1/tickets/${encodeURIComponent(radicado)}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({estado:selector.value,respuesta:response.value})});const data=await result.json();if(!result.ok)throw new Error(data.mensaje||'No se pudo actualizar');save.textContent='Guardado';setTimeout(()=>{save.textContent='Guardar';},1200);}catch(error){save.textContent='Error';window.alert(error.message);}finally{save.disabled=false;}}
+    async function checkSession(){try{const response=await fetch('/api/v1/admin/me');if(!response.ok){adminLogin.hidden=false;adminContent.hidden=true;return;}const result=await response.json();canManage=result.usuario.role==='admin'||result.usuario.role==='gestor';sessionUser.textContent=`${result.usuario.username} (${result.usuario.role})`;adminLogin.hidden=true;adminContent.hidden=false;loadTickets();}catch(_error){adminLogin.hidden=false;adminContent.hidden=true;}}
+    async function loadTickets(){try{const response=await fetch('/api/v1/tickets');if(!response.ok)throw new Error('No se pudo cargar');const result=await response.json();ticketCount.textContent=String(result.total).padStart(2,'0');ticketRows.replaceChildren();if(!result.tickets.length){ticketRows.innerHTML='<tr><td colspan="5" class="empty">Aún no hay tickets registrados. Usa “Radicar con SLA” para crear el primero.</td></tr>';return;}result.tickets.forEach((ticket)=>ticketRows.append(renderTicketRow(ticket)));}catch(_error){ticketRows.innerHTML='<tr><td colspan="5" class="empty">No se pudo cargar el tablero. Verifica que el servidor esté activo.</td></tr>';}}
+    loginForm.addEventListener('submit',async(event)=>{event.preventDefault();loginStatus.textContent='';if(!loginForm.checkValidity()){loginForm.reportValidity();return;}const payload={username:document.querySelector('#adminUsername').value.trim(),password:document.querySelector('#adminPassword').value};try{const response=await fetch('/api/v1/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const result=await response.json();if(!response.ok){loginStatus.textContent=result.mensaje||'No fue posible iniciar sesión.';return;}loginForm.reset();checkSession();}catch(_error){loginStatus.textContent='No se pudo conectar con el servidor.';}});
+    logoutButton.addEventListener('click',async()=>{await fetch('/api/v1/admin/logout',{method:'POST'});canManage=false;adminLogin.hidden=false;adminContent.hidden=true;});
+    form.addEventListener('submit',async(event)=>{event.preventDefault();clearErrors();statusElement.textContent='';if(!form.checkValidity()){form.reportValidity();return;}submitButton.disabled=true;statusElement.textContent='Generando ticket...';const formData=new FormData(form);const payload=Object.fromEntries(formData.entries());payload.habeasData=formData.get('habeasData')==='on';try{const response=await fetch('/api/v1/tickets',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const result=await response.json();if(!response.ok){showErrors(result.errores||{});statusElement.textContent=result.mensaje||'No fue posible registrar la PQR.';return;}radicadoElement.textContent=result.radicado;confirmation.hidden=false;form.hidden=true;statusElement.textContent='';showView('create');}catch(_error){statusElement.textContent='No se pudo conectar con el servidor. Intenta de nuevo.';}finally{submitButton.disabled=false;}});
+    searchForm.addEventListener('submit',async(event)=>{event.preventDefault();searchStatus.textContent='';searchResult.replaceChildren();const radicado=searchRadicado.value.trim();if(!radicado){searchStatus.textContent='Ingresa un número de radicado.';return;}searchStatus.textContent='Buscando ticket...';try{const response=await fetch(`/api/v1/tickets/buscar?radicado=${encodeURIComponent(radicado)}`);const result=await response.json();if(!response.ok){searchStatus.textContent=result.mensaje||'No se encontró la PQR.';return;}searchStatus.textContent='';renderSearchResult(result.ticket);}catch(_error){searchStatus.textContent='No se pudo conectar con el servidor. Intenta de nuevo.';}});
+  </script>
+</body>
+</html>

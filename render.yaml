@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: sistema-pqr
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ADMIN_USERS_JSON
+        sync: false
+      - key: GOOGLE_FORMS_SECRET
+        sync: false

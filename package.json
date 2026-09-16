@@ -1,0 +1,12 @@
+{
+  "name": "sistema-pqr",
+  "version": "1.0.0",
+  "description": "Sistema de Peticiones, Quejas, Reclamos y Sugerencias",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
