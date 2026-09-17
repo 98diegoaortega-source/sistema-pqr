@@ -187,8 +187,14 @@ app.post('/api/v1/integrations/google-forms', (req, res) => {
 
   const body = req.body || {};
   const { data, errors } = validateTicket({ ...body, habeasData: true });
-  if (body.externalId && Array.from(tickets.values()).some((ticket) => ticket.externalId === body.externalId)) {
-    return res.status(200).json({ mensaje: 'La respuesta ya estaba sincronizada.' });
+  if (body.externalId) {
+    const existingTicket = Array.from(tickets.values()).find((ticket) => ticket.externalId === body.externalId);
+    if (existingTicket) {
+      return res.status(200).json({
+        mensaje: 'La respuesta ya estaba sincronizada.',
+        radicado: existingTicket.radicado,
+      });
+    }
   }
 
   if (Object.keys(errors).length > 0) {

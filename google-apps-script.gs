@@ -40,7 +40,16 @@ function onFormSubmit(event) {
     throw new Error(`La API PQR respondio ${status}: ${response.getContentText()}`);
   }
 
-  Logger.log(response.getContentText());
+  const result = JSON.parse(response.getContentText());
+  if (payload.correoElectronico && result.radicado) {
+    MailApp.sendEmail({
+      to: payload.correoElectronico,
+      subject: `Radicado PQRSF ${result.radicado} - Elyon Yireh`,
+      htmlBody: `<p>Hola ${payload.nombreCompleto || 'usuario'},</p><p>Tu solicitud fue registrada correctamente en el sistema PQRSF.</p><p><strong>Número de radicado:</strong> ${result.radicado}</p><p>Conserva este número para consultar el estado de tu solicitud.</p>`,
+    });
+  }
+
+  Logger.log(`Radicado generado: ${result.radicado || 'no disponible'}`);
 }
 
 function getValue(namedValues, possibleNames) {
