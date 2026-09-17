@@ -7,7 +7,7 @@
  * 4. Pega este archivo y crea un activador para onFormSubmit:
  *    Activadores > Anadir activador > onFormSubmit > Desde hoja de calculo > Al enviar formulario.
  */
-const API_URL = 'https://TU-DOMINIO.com/api/v1/integrations/google-forms';
+const API_URL = 'https://sistema-pqr-sf0w.onrender.com/api/v1/integrations/google-forms';
 const API_SECRET = 'CAMBIA_ESTE_SECRETO_LARGO';
 
 function onFormSubmit(event) {
